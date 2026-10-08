@@ -16,6 +16,13 @@ body{margin:0;font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-seri
 .topbar button:hover{background:rgba(255,255,255,.28)}
 .topbar button.primary{background:#fff;color:var(--accent);font-weight:600}
 .topbar button.primary:hover{background:#e9f0f8}
+.topbar a.legal{color:#fff;opacity:.85;font-size:12px;text-decoration:underline;margin-right:6px}
+.topbar a.legal:hover{opacity:1}
+dialog{border:0;border-radius:12px;padding:22px 24px;max-width:520px;width:calc(100% - 32px);color:var(--ink);box-shadow:0 10px 40px rgba(20,30,50,.35)}
+dialog::backdrop{background:rgba(20,30,50,.45)}
+dialog h2{margin:0 0 12px;font-size:17px;color:var(--accent)}
+dialog p{margin:0 0 12px}
+dialog .actions{text-align:right;margin-top:16px}
 
 /* ---------- Mise en page ---------- */
 .layout{display:grid;grid-template-columns:minmax(380px,520px) 1fr;gap:20px;padding:20px;align-items:start}
@@ -109,7 +116,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid #8fb4d9;border-color:#
 @page{@bottom-center{content:"Page " counter(page) " / " counter(pages);font-size:8pt;color:#777;font-family:Arial,sans-serif}}
 @media print{
   body{background:#fff}
-  .topbar,#form{display:none!important}
+  .topbar,#form,dialog{display:none!important}
   .layout{display:block;padding:0}
   .doc{box-shadow:none;max-width:none;padding:0;margin:0}
 }
@@ -119,12 +126,23 @@ input:focus,select:focus,textarea:focus{outline:2px solid #8fb4d9;border-color:#
 
 <div class="topbar">
   <h1>EAP Plus © HerculePro 2026</h1>
+  <a href="#" id="bLegal" class="legal">Mentions légales</a>
   <button id="bNew" type="button">Nouveau</button>
   <button id="bImport" type="button">Ouvrir…</button>
   <button id="bExport" type="button">Enregistrer (.json)</button>
   <button id="bPrint" type="button" class="primary">Imprimer / PDF</button>
   <input type="file" id="fImport" accept="application/json,.json" hidden>
 </div>
+
+<dialog id="legal" aria-labelledby="legalTitle">
+  <form method="dialog">
+    <h2 id="legalTitle">Mentions légales</h2>
+    <p>En conformité avec la législation en vigueur et les règles de protection des données personnelles, ce programme ne stocke aucune donnée ailleurs que sur votre poste de travail via les cookies.<br>
+    Il n’a pour vocation qu’à générer un document que vous pouvez ensuite exporter en Json (enregistrer) pour un traitement dans un autre logiciel ou imprimer via PDF.</p>
+    <p>HerculePro est garant de la confidentialité des données contenues dans ce document.</p>
+    <div class="actions"><button class="btn-light">Fermer</button></div>
+  </form>
+</dialog>
 
 <div class="layout">
 <form id="form" autocomplete="off" onsubmit="return false">
@@ -599,6 +617,14 @@ $('bPrint').addEventListener('click', () => {
   document.title = ['EAP', state.meta.nom, state.meta.prenom, state.meta.year].filter(Boolean).join(' - ');
   window.addEventListener('afterprint', () => { document.title = old; }, {once:true});
   window.print();
+});
+
+/* ---------- Mentions légales ---------- */
+const legal = $('legal');
+$('bLegal').addEventListener('click', e => { e.preventDefault(); legal.showModal(); });
+legal.addEventListener('click', e => {
+  const r = legal.getBoundingClientRect();
+  if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) legal.close();
 });
 
 /* ---------- Démarrage ---------- */
